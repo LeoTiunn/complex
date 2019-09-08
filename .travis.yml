@@ -22,15 +22,16 @@ after_success:
   - docker push leotn/multi-nginx
   - docker push leotn/multi-server
   - docker push leotn/multi-worker
-# deploy:
-#   provider: elasticbeanstalk
-#   region: "us-east-2"
-#   app: "docker-react"
-#   env: "DockerReact-env"
-#   bucket_name: "elasticbeanstalk-us-east-2-677439251017"
-#   bucket_path: "docker-react"
-#   on:
-#     branch: master
-#   access_key_id: $AWS_ACCESS_KEY
-#   secret_access_key:
-#     secure: "$AWS_SECRET_KEY"
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-2"
+  app: "multi-docker"
+  env: "MultiDocker-env"
+  bucket_name: "elasticbeanstalk-us-east-2-677439251017"
+  bucket_path: "docker-multi"
+  on:
+    branch: master
+  access_key_id:
+    secure: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"
