@@ -4,6 +4,7 @@ const keys = require('./keys');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 app.use(cors());
@@ -51,19 +52,22 @@ app.get('/values/current', async (req, res) => {
   });
 });
 
-app.post('/values', async (req, res) => {
-  const index = req.body.index;
+app.post('/values',
+  body('index').isInt({ max: 40 }).withMessage('Index must be an integer less than or equal to 40'),
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
 
-  if (parseInt(index) > 40) {
-    return res.status(422).send('Index too high');
-  }
+    const index = req.body.index;
 
-  redisClient.hset('values', index, 'Nothing yet!');
-  redisPublisher.publish('insert', index);
-  pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
+    redisClient.hset('values', index, 'Nothing yet!');
+    redisPublisher.publish('insert', index);
+    pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
 
-  res.send({ working: true });
-});
+    res.send({ working: true });
+  });
 
 app.listen(5000, err => {
   console.log('Listening');
